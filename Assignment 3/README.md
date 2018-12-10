@@ -1,5 +1,8 @@
 # Assignment 3
 
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>
+
+
 ## 一、频域滤波
 
 给定图像 ‘barb.png’ ， 利用一阶 Butterworth 低通滤波器进行频域滤波， 当 D 0 = 10,20,40,80 时，给出相应滤波图像，并分别以频域和空域的观点解释有关滤波结果。
@@ -33,9 +36,9 @@
 
 
    为了便于频域的滤波和频谱的分析，常常在变换之前进行频谱的中心化。根据频域平移性的性质有：
-   $$
+$$
    F(u-u_0,v-v_0)=f(x,y)e^{j2\pi(\frac{u_0x}{M}+\frac{v_0y}{N})}
-   $$
+$$
 
 
    当$u_0=\frac{M}{2},v_0=\frac{N}{2}$时，$e^{j2\pi(\frac{u_0x}{M}+\frac{v_0y}{N})}=(-1)^{x+y}$
@@ -57,12 +60,12 @@
 
 
    截断傅立叶变化中所有高频成分
-   $$
+$$
    H(u,v)=\begin{cases}
    1 & D(u,v)\leq D_0 \\
    0 & D(u,v)>D_0\\
    \end{cases}，其中D(u,v) = \sqrt{u^2+v^2}
-   $$
+$$
    以D0为半径的圆内所有频率分量无损的通过，圆外的所有频率分量完全衰减。
 
    **注意：傅立叶变换是酉变换，不改变信号能量**
