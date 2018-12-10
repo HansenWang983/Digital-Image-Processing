@@ -1,7 +1,7 @@
 # Assignment 3
 
 <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>
-
+[数学公式显示请先安装Chrome插件](https://chrome.google.com/webstore/detail/mathjax-plugin-for-github/ioemnmodlmafdkllaclgeombjnmnbima)
 
 ## 一、频域滤波
 
