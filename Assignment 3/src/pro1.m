@@ -1,56 +1,33 @@
-clear all
+clear 
 
 barb_img = imread('../barb.png');
 
 [M,N] = size(barb_img);
 
-
-subplot(221),imshow(barb_img,[]),title('原图像f(x,y)')
+subplot(321),imshow(barb_img,[]),title('原图像f(x,y)')
+% subplot(321),imshow(log(1+abs(fft2(barb_img))),[]),title('原频谱图像f(x,y)')
 
 % 以(-1)^{(x+y)}乘以输入图像进行中心变换
-% [Y,X]=meshgrid(1:M,1:N);
-% barb_img(x,y) = barb_img.*(-1).^(X+Y);
-for x = 1:M
-    for y = 1:N
-        barb_img(x,y) = barb_img(x,y).*(-1).^(x+y);
-    end
-end 
+[X,Y]=meshgrid(1:M,1:N);
+% 类型转换
+barb_img = double(barb_img);
+barb_img = barb_img.*(-1).^(X+Y);
 
-subplot(222),imshow(barb_img,[]),title('空域中心化调制图像')
+subplot(322),imshow(uint8(barb_img),[]),title('空域中心化调制图像')
 
-F = fft2(barb_img);
+[res_10,f_res10] = butterworth_filter(barb_img,1,10);
+[res_20,f_res20] = butterworth_filter(barb_img,1,20);
+[res_40,f_res40] = butterworth_filter(barb_img,1,40);
+[res_80,f_res80] = butterworth_filter(barb_img,1,80);
 
-subplot(223),imshow(log(1+abs(F)),[]),title('傅里叶频谱')
+subplot(323),imshow(res_10,[]),title('D0=10 butterworth filter低通滤波')
+subplot(324),imshow(res_20,[]),title('D0=20 butterworth filter低通滤波')
+subplot(325),imshow(res_40,[]),title('D0=40 butterworth filter低通滤波')
+subplot(326),imshow(res_80,[]),title('D0=80 butterworth filter低通滤波')
 
-
-% 频谱图像尺寸
-[N1,N2]=size(F);                 
-n=2;                                    
-d0=80;                              
-% 数据圆整      
-n1=fix(N1/2);                      
-n2=fix(N2/2);                            
-for i=1:N1                               
-    for j=1:N2
-            d=sqrt((i-n1)^2+(j-n2)^2);
-            if d==0
-                h=0;                     
-            else
-                % Butterworth低通的幅频响应
-                h=1/(1+(d/d0)^(2*n));     
-            end
-            % 图像矩阵计算处理
-            result(i,j)=h*F(i,j);          
-    end
-end
-
-% 对傅立叶变换结果取绝对值，然后取对数
-% F2 = log(1+abs(result));        
-% 将计算后的矩阵用图像表示
-% subplot(224),imshow(F2),title('Butterworth滤波后的频谱图像')
-
-result=ifftshift(result);               % 傅立叶变换平移
-X2=ifft2(result);                       % 图像傅立叶逆变换
-X3=uint8(real(X2));                     % 数据类型转换
-subplot(224),imshow(X3)               % 显示处理后的图像
-xlabel('(d) Butterworth低通滤波图像');
+% 显示频谱图像
+% subplot(322),imshow(log(1+abs(fft2(barb_img))),[]),title('空域中心化调制后的频谱图像')
+% subplot(323),imshow(f_res10,[]),title('D0=10 ')
+% subplot(324),imshow(f_res20,[]),title('D0=20 ')
+% subplot(325),imshow(f_res40,[]),title('D0=40 ')
+% subplot(326),imshow(f_res80,[]),title('D0=80 ')

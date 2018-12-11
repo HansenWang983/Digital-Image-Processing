@@ -1,4 +1,4 @@
-clear all
+clear 
 
 f = zeros(512,512);
 f(246:266,230:276)=1;
@@ -15,7 +15,7 @@ Fc =fftshift(F);
 Fd=abs(Fc);
 subplot(223),imshow(Fd,[]),title('幅度谱（频谱坐标原点在屏幕中央）')
 
-ratio=max(Fd(:))/min(Fd(:))
+ratio=max(Fd(:))/min(Fd(:));
 % ratio = 2.3306e+007,动态范围太大，显示器无法正常显示
 
 % 取对数
