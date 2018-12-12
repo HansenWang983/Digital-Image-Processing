@@ -21,6 +21,6 @@ function [res,f_res] = butterworth_filter(img,n,D0)
     % 频谱矩阵取对数
     f_res = log(1+abs(f_res));
     % 反中心变换
-    [X,Y]=meshgrid(1:M,1:N);
+    [X,Y]=meshgrid(1:N,1:M);
     res = uint8(res.*(-1).^(X+Y));
 end

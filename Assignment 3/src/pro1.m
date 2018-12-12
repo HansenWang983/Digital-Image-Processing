@@ -8,7 +8,7 @@ subplot(321),imshow(barb_img,[]),title('原图像f(x,y)')
 % subplot(321),imshow(log(1+abs(fft2(barb_img))),[]),title('原频谱图像f(x,y)')
 
 % 以(-1)^{(x+y)}乘以输入图像进行中心变换
-[X,Y]=meshgrid(1:M,1:N);
+[X,Y]=meshgrid(1:N,1:M);
 % 类型转换
 barb_img = double(barb_img);
 barb_img = barb_img.*(-1).^(X+Y);
