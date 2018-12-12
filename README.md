@@ -2,7 +2,8 @@
 
 ## Environment
 
-matlab
+- matlab
+
 
 ## Assignment 1
 
@@ -13,3 +14,8 @@ matlab
 
 - pattern detecting
 - median filter
+
+## Assignment 3
+
+- butterworth filter
+- homomorphic filter
