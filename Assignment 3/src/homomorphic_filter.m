@@ -1,36 +1,25 @@
 function [res,f_res] = homomorphic_filter(img,D0,H,L,C)
-    % 转换为灰度图像
-    img =double(rgb2gray(img));
-    % 取对数
-    img = log(1+img);
-
     [M,N] = size(img);
-
-    % 中心变换
-    [X,Y]=meshgrid(1:N,1:M);
-    img = img.*(-1).^(X+Y);
-    % 频谱矩阵
     f_res = zeros(M,N);
-    % 傅立叶变换
+    % 对图像进行二维快速傅里叶变换
     F = fft2(img);
-    % 高通同态滤波
+    % 频谱图像大小与空域图像相同
     for u = 1:M
         for v = 1:N
-            d = u^2+v^2;
-            h = (H-L).*(1-exp(-C.*(d./D0^2)))+L;
-            f_res(u,v) = h*F(u,v);
+            % butterworth低通滤波器
+            if D0 == 0 
+                h = 0;
+            else
+                h = 1 / (1 + (sqrt(u^2+v^2)/D0)^(2*n));
+            end
+            % 与滤波函数相乘，等于空域卷积
+            f_res(u,v) = F(u,v)*h;
         end
     end
-    % 反傅立叶变换
+    % DFT反变换取实部
     res = real(ifft2(f_res));
-    % 反中心变换
-    [X,Y] = meshgrid(1:N,1:M);
-    res = res.*(-1).^(X+Y);
-    % 取指数
-    res = exp(res)-1;
-    % 频谱矩阵
+    % 频谱矩阵取对数
     f_res = log(1+abs(f_res));
- 
-    subplot(221),imshow(res,[]),title(['D0=',num2str(D0),' homomorphic filter高通图像'])
-    subplot(222),imshow(f_res,[]),title(['D0=',num2str(D0),' homomorphic filter高通频谱'])
-
+    % 反中心变换
+    [X,Y]=meshgrid(1:N,1:M);
+    res = uint8(res.*(-1).^(X+Y));
