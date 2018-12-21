@@ -12,7 +12,7 @@ q = N / 2 + 1.0;
 a = 0.1;
 b = 0.1;
 T = 1;
-k = 0.01;
+k = 0.000005;
 m = 0;
 n = 500;
 
@@ -44,7 +44,12 @@ noise = m + sqrt(n) * randn([M, N]);
 Fn = fftshift(fft2(noise));
 
 % 生成维纳滤波的傅里叶变换
-Wiener = (abs(H).^2) ./ (abs(H).^2 + k) ./ H;
+% Wiener = (abs(H).^2) ./ (abs(H).^2 + k) ./ H;
+for u = 1 : M
+    for v = 1 : N
+       Wiener(u,v) = (abs(H(u,v)).^2) ./ (abs(H(u,v)).^2 + k*((u-p)^2+(v-q)^2)) ./ H(u,v);
+    end
+end
 
 % 生成运动模糊图像
 MotionBlurred_f = F .* H;
