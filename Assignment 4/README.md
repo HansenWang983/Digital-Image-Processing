@@ -203,30 +203,19 @@ BlurredNoisy_Inverse = real(ifft2(BlurredNoisy_Inverse_f));
 
 ![3](Assets/21.jpg)
 
-如果使用的是第二种形式，其中$\lambda$较第一种格式取值更小，小大约4到5个数量级，$\lambda$与噪声和未退化图像之间的信噪比有关。
+如果使用的是第二种形式，其中$\lambda$较第一种格式取值更小，小大约4到5个数量级，而第一种形式，$\lambda$大约在0.01左右效果较好，其中$\lambda$与噪声和未退化图像之间的信噪比有关。
 
 ```matlab
-lambda = 0.000005;
 % 生成维纳滤波的傅里叶变换
-for u = 1 : M
-    for v = 1 : N
-       Wiener(u,v) = (abs(H(u,v)).^2) ./ (abs(H(u,v)).^2 + lambda*((u-p)^2+(v-q)^2)) ./ H(u,v);
-    end
-end
+% 第一种公式
+Wiener = (H.*conj(H))./(H.*(H.*conj(H)+lambda));     
 
-% 对运动模糊图像进行维纳滤波
-MotionBlurred_Wiener_f =  MotionBlurred_temp_f .* Wiener;
-MotionBlurred_Wiener = real(ifft2(MotionBlurred_Wiener_f));
-
-% 对模糊加噪声图像进行逆滤波
-BlurredNoisy_Inverse_f = BlurredNoisy_temp_f ./ H;
-BlurredNoisy_Inverse = real(ifft2(BlurredNoisy_Inverse_f));
-```
-
-或者第一种形式，$\lambda$大约在0.01左右效果较好。
-
-```matlab
-Wiener = (abs(H).^2) ./ (abs(H).^2 + lambda) ./ H;
+% 第二种公式    
+% for u = 1 : M
+%     for v = 1 : N
+%        % Wiener(u,v) = (abs(H(u,v)).^2) ./ (abs(H(u,v)).^2 + lambda*((u-p)^2+(v-q)^2)) ./ H(u,v);
+%     end
+% end
 ```
 
 
@@ -246,18 +235,17 @@ img = imread('../book_cover.jpg');
 [M, N] = size(img);
 
 % 参数如下：
-% p,q为频率中心，
-% m,n 分别为高斯噪声的均值和方差
-% a,b,T为运动模糊参数，
+% p,q为频率中心，a,b,T为运动模糊参数，
 % lambda为维纳滤波参数
+% m,n 分别为高斯噪声的均值和方差
 p = M / 2 + 1.0;
 q = N / 2 + 1.0;
-m = 0;
-n = 500;
 a = 0.1;
 b = 0.1;
 T = 1;
-lambda = 0.05;
+lambda = 0.01;
+m = 0;
+n = 500;
 
 % 读取图像
 img = double(img);
@@ -277,7 +265,7 @@ for u = 1 : M
         if (d == 0)
             H(u,v) = T;
         else
-            H(u,v) =  T * sin(d) / d * exp(-1i * (d));
+            H(u,v) =  T * sin(d) / d * exp(-j * (d));
         end
     end
 end
@@ -286,21 +274,22 @@ end
 noise = m + sqrt(n) * randn([M, N]);
 Fn = fftshift(fft2(noise));
 
+
 % 生成维纳滤波的傅里叶变换
-for u = 1 : M
-    for v = 1 : N
-       % 第一种公式
-       Wiener(u,v) = (abs(H(u,v)).^2) ./ (abs(H(u,v)).^2 + lambda) ./ H(u,v);  
-       % 第二种公式
-       % Wiener(u,v) = (abs(H(u,v)).^2) ./ (abs(H(u,v)).^2 + lambda*((u-p)^2+(v-q)^2)) ./ H(u,v);
-    end
-end
+% 第一种公式
+Wiener = (H.*conj(H))./(H.*(H.*conj(H)+lambda));     
+
+% 第二种公式    
+% for u = 1 : M
+%     for v = 1 : N
+%        % Wiener(u,v) = (abs(H(u,v)).^2) ./ (abs(H(u,v)).^2 + lambda*((u-p)^2+(v-q)^2)) ./ H(u,v);
+%     end
+% end
 
 % 生成运动模糊图像
 MotionBlurred_f = F .* H;
 MotionBlurred = real(ifft2(MotionBlurred_f));
 % 反中心变换
-[X,Y] = meshgrid(1:N,1:M);
 MotionBlurred = MotionBlurred.*(-1).^(X+Y);
 subplot(231),imshow(MotionBlurred,[]),title('运动模糊图像');
 
@@ -308,57 +297,50 @@ subplot(231),imshow(MotionBlurred,[]),title('运动模糊图像');
 BlurredNoisy_f = F .* H + Fn;
 BlurredNoisy = real(ifft2(BlurredNoisy_f));
 % 反中心变换
-[X,Y] = meshgrid(1:N,1:M);
 BlurredNoisy = BlurredNoisy.*(-1).^(X+Y);
 subplot(232),imshow(BlurredNoisy,[]),title('运动模糊加噪图像');
 
-% 获得模糊图像的频域信息
-MotionBlurred_temp = MotionBlurred;
-% 中心变换
-[X,Y]=meshgrid(1:N,1:M);
-MotionBlurred_temp = MotionBlurred_temp.*(-1).^(X+Y);
-% 对运动模糊图像进行傅里叶变换
-MotionBlurred_temp_f = fft2(MotionBlurred_temp);
 
 % 对运动模糊图像进行逆滤波
-MotionBlurred_Inverse_f =  MotionBlurred_temp_f ./ H;
+MotionBlurred_Inverse_f =  MotionBlurred_f ./ H;
 MotionBlurred_Inverse = real(ifft2(MotionBlurred_Inverse_f));
 % 反中心变换
-[X,Y] = meshgrid(1:N,1:M);
 MotionBlurred_Inverse = MotionBlurred_Inverse.*(-1).^(X+Y);
 subplot(233),imshow(MotionBlurred_Inverse,[]),title('运动模糊图像进行逆滤波');
 
 % 对运动模糊图像进行维纳滤波
-MotionBlurred_Wiener_f =  MotionBlurred_temp_f .* Wiener;
+MotionBlurred_Wiener_f =  MotionBlurred_f .* Wiener;
 MotionBlurred_Wiener = real(ifft2(MotionBlurred_Wiener_f));
 % 反中心变换
-[X,Y] = meshgrid(1:N,1:M);
 MotionBlurred_Wiener = MotionBlurred_Wiener.*(-1).^(X+Y);
 subplot(234),imshow(MotionBlurred_Wiener,[]),title('运动模糊图像进行维纳滤波');
 
-% 获得模糊加噪图像的频域信息
-BlurredNoisy_temp = BlurredNoisy;
-% 中心变换
-[X,Y]=meshgrid(1:N,1:M);
-BlurredNoisy_temp = BlurredNoisy_temp.*(-1).^(X+Y);
-% 对运动模糊图像进行傅里叶变换
-BlurredNoisy_temp_f = fft2(BlurredNoisy_temp);
 
 % 对模糊加噪声图像进行逆滤波
-BlurredNoisy_Inverse_f = BlurredNoisy_temp_f ./ H;
+BlurredNoisy_Inverse_f = BlurredNoisy_f ./ H;
 BlurredNoisy_Inverse = real(ifft2(BlurredNoisy_Inverse_f));
 % 反中心变换
-[X,Y] = meshgrid(1:N,1:M);
 BlurredNoisy_Inverse = BlurredNoisy_Inverse.*(-1).^(X+Y);
 subplot(235),imshow(BlurredNoisy_Inverse,[]),title('模糊加噪图像进行逆滤波');
 
 % 对模糊加噪图像进行维纳滤波
-BlurredNoisy_Wiener_f = BlurredNoisy_temp_f .* Wiener;
+BlurredNoisy_Wiener_f = BlurredNoisy_f .* Wiener;
 BlurredNoisy_Wiener = real(ifft2(BlurredNoisy_Wiener_f));
 % 反中心变换
-[X,Y] = meshgrid(1:N,1:M);
 BlurredNoisy_Wiener = BlurredNoisy_Wiener.*(-1).^(X+Y);
-subplot(236),imshow(BlurredNoisy_Wiener,[]),title('模糊加噪图像进行维纳滤波');
+subplot(236),imshow(BlurredNoisy_Wiener,[]),title(['模糊加噪图像进行维纳滤波,k=',num2str(lambda)]);
+
+
+figure,
+i=1;
+for lambda=[1e-1,1e-2,0.005]
+    Res_f=(H.*conj(H)).*BlurredNoisy_f./(H.*(H.*conj(H)+lambda));
+    Res_img=real(ifft2(Res_f));
+    Res_img = Res_img.*(-1).^(X+Y);
+    subplot(1,3,i),imshow(Res_img,[]);
+    i = i + 1;
+    title(strcat('Parametric Wiener filtering, k=', num2str(lambda)));
+end
 ```
 
 
@@ -369,15 +351,95 @@ subplot(236),imshow(BlurredNoisy_Wiener,[]),title('模糊加噪图像进行维�
 
 ### 一、运动模糊图像（a=0.1,b=0.1,T=1)
 
+![1](result/1.jpg)
+
+
+
 ### 二、加入高斯噪声后的模糊图像
+
+![1](result/2.jpg)
+
+
 
 ### 三、使用逆滤波器复原的两张图像
 
+运动模糊复原
+
+![1](result/3.jpg)
+
+加噪模糊复原
+
+![1](result/4.jpg)
+
+
+
 ### 四、使用不同参数的维纳滤波器复原的两张图像
 
+#### 第一种公式，lambda为0.1
+
+运动模糊复原
+
+![1](result/5.jpg)
+
+
+
+加噪模糊复原
+
+![1](result/10.jpg)
 
 
 
 
 
+#### lambda为0.01
+
+运动模糊复原
+
+![1](result/6.jpg)
+
+加噪模糊复原
+
+![1](result/9.jpg)
+
+
+
+#### lambda为0.005
+
+运动模糊复原
+
+![1](result/7.jpg)
+
+
+
+加噪模糊复原
+
+![1](result/8.jpg)
+
+
+
+总体对比
+
+![1](result/15.jpg)
+
+不同参数的维纳滤波对加噪模糊的复原
+
+噪声方差为500
+
+![1](result/14.jpg)
+
+噪声方差为50
+
+![1](result/16.jpg)
+
+噪声方差为5
+
+![1](result/17.jpg)
+
+
+
+分析：
+
+1. 直接逆滤波对于没有加入噪声的图像复原效果好，可以直接还原，消除模糊的能力很强。
+2. 维纳滤波的结果显然要比直接逆滤波的对加入噪声的图像复原效果好，减少了噪声信号因为逆滤波导致的放大。通过减少噪声方差，发现逆滤波后的图像噪声仍然非常强，仍然支配着结果。而维纳滤波的效果则有明显改进。
+3. 通过对lambda交互式的选择，发现较小的值还原效果更好，但过小的值会导致图像亮度下降。
 

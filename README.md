@@ -19,3 +19,11 @@
 
 - butterworth filter
 - homomorphic filter
+
+## Assignment 4
+
+- image restoration
+- motion blurred filter
+- direct inverse filter 
+- parametric Wiener filter
+
