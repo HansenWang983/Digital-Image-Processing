@@ -5,14 +5,14 @@ img = imread('../book_cover.jpg');
 
 % 参数如下：
 % p,q为频率中心，a,b,T为运动模糊参数，
-% k为维纳滤波参数
+% lambda为维纳滤波参数
 % m,n 分别为高斯噪声的均值和方差
 p = M / 2 + 1.0;
 q = N / 2 + 1.0;
 a = 0.1;
 b = 0.1;
 T = 1;
-k = 0.000005;
+lambda = 0.05;
 m = 0;
 n = 500;
 
@@ -44,10 +44,12 @@ noise = m + sqrt(n) * randn([M, N]);
 Fn = fftshift(fft2(noise));
 
 % 生成维纳滤波的傅里叶变换
-% Wiener = (abs(H).^2) ./ (abs(H).^2 + k) ./ H;
 for u = 1 : M
     for v = 1 : N
-       Wiener(u,v) = (abs(H(u,v)).^2) ./ (abs(H(u,v)).^2 + k*((u-p)^2+(v-q)^2)) ./ H(u,v);
+       % 第一种公式
+       Wiener(u,v) = (abs(H(u,v)).^2) ./ (abs(H(u,v)).^2 + lambda) ./ H(u,v);  
+       % 第二种公式
+       % Wiener(u,v) = (abs(H(u,v)).^2) ./ (abs(H(u,v)).^2 + lambda*((u-p)^2+(v-q)^2)) ./ H(u,v);
     end
 end
 
