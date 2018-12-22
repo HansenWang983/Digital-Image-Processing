@@ -26,4 +26,3 @@
 - motion blurred filter
 - direct inverse filter 
 - parametric Wiener filter
-
