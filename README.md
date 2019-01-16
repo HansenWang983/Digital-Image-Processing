@@ -26,3 +26,8 @@
 - motion blurred filter
 - direct inverse filter 
 - parametric Wiener filter
+
+## Assignment 5
+
+- Morphological Processing
+- Image Segmentation
