@@ -31,3 +31,8 @@
 
 - Morphological Processing
 - Image Segmentation
+
+## Final Project
+
+- Face Recognition in Eigenfaces with PCA (principle component analysis) 
+
