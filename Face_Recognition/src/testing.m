@@ -1,5 +1,8 @@
-% load training_40_means.mat
+% testing.m
+clear;
+load training.mat;
 
+tic;
 % 记录识别正确数
 correct_num = 0;
 for x = 1:40
@@ -42,5 +45,7 @@ for x = 1:40
         % title('Recognized Image');
     end
 end
+t1 = toc;
 disp(['识别正确的图像数: ',num2str(correct_num),'/120']);
 disp(['识别系统的正确率: ',num2str(correct_num/120)]);
+disp(['测试用时(s): ',num2str(t1)]);
