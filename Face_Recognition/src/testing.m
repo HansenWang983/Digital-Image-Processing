@@ -1,6 +1,7 @@
 % testing.m
 clear;
 load training.mat;
+load random_gene.mat;
 
 tic;
 % 记录识别正确数
@@ -34,7 +35,7 @@ for x = 1:40
             correct_num = correct_num+1;
         end
 
-        % 显示识别图像，用于全局训练
+        % 显示识别图像，用于N=280时的全局训练
         % directories = ceil(match_index / 10);
         % subject = mod(match_index,10);
         % if subject == 0

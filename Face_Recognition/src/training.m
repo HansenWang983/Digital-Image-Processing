@@ -1,18 +1,15 @@
 % training.m
 clear;
+load random_gene.mat;
 
 Img_Mat = [];
 row = 112;
 col = 92;
 d = row*col;
-k = 100;
+k = 50;
 
 tic;
 for x = 1:40 
-     % 每个目录随机选取7个作为训练样本，剩余3个作为测试样本
-     idx = randperm(10);
-     training_set(x,:) = idx(1:7);
-     testing_set(x,:) = idx(8:10);
      % temp_set d*7
      temp_set = [];
      for y = training_set(x,:)
@@ -47,11 +44,10 @@ eiv_sort = eiv(:,ind);
 Vk_mat = eiv_sort(:,1:k);
 
 % Ei_Face k*N
-Ei_Face = Vk_mat' * differ_mat ;     %得到协方差矩阵的特征向量组成的投影子空间
+Ei_Face = Vk_mat' * differ_mat ;     %得到投影子空间的坐标
 
-% project_sample d*N
-% project_sample = [];
-% project_sample = Vk_mat * Ei_Face;
 t1 = toc;
+disp(['k: ',num2str(k)]);
 disp(['训练用时(s): ',num2str(t1)]);
-save training.mat img_mean Vk_mat Ei_Face testing_set d
+save training.mat img_mean Vk_mat Ei_Face d
+save eigenvector_sort.mat eiv_sort differ_mat img_mean

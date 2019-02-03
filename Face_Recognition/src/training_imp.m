@@ -1,18 +1,15 @@
 % training_imp.m
 clear;
+load random_gene.mat;
 
 Img_Mat = [];
 row = 112;
 col = 92;
 d = row*col;
-k = 25;
+k = 30;
 
 tic;
 for x = 1:40 
-     % 每个目录随机选取7个作为训练样本，剩余3个作为测试样本
-     idx = randperm(10);
-     training_set(x,:) = idx(1:7);
-     testing_set(x,:) = idx(8:10);
      % temp_set d*7
      temp_set = [];
      for y = training_set(x,:)
@@ -25,13 +22,25 @@ for x = 1:40
 end
 
 % display the mean image
-for x = 1:5
-    for y = 1:8
-        temp_mat = Img_Mat(:,(x-1)*8+y);
-        temp_mat = reshape(temp_mat,[row col]);
-        subplot(5,8,(x-1)*8+y),imshow(temp_mat,[]);
-    end
-end
+% space = 2; %间距的大小
+% subplot_row = 5; %子图行数
+% subplot_col = 8; %子图列数
+% immat = zeros(space*(subplot_row+1)+row*subplot_row,space*(subplot_col+1)+col*subplot_col);
+% immat = uint8(immat);
+% for ii = 1:subplot_row
+%      for kk = 1:subplot_col
+%           index = (ii-1)*subplot_col+kk;
+%           temp_mat = Img_Mat(:,index);
+%           temp_mat = reshape(temp_mat,[row col]);
+%           temp_max = max(max(temp_mat));
+%           temp_min = min(min(temp_mat));
+%           temp_range = temp_max - temp_min;
+%           temp_mat = round(255*(temp_mat - temp_min)/temp_range);
+%           immat((ii-1)*row+1+ii*space:ii*(row+space),(kk-1)*col+kk*space+1:kk*(col+space)) = temp_mat;
+%      end
+% end
+% figure
+% imshow(immat)
 
 % differ_mat d*N
 differ_mat = [];
@@ -62,19 +71,10 @@ Vk_mat = differ_mat * Wk_mat;
 Vk_mat = normc(Vk_mat);
 
 % Ei_Face k*N
-Ei_Face = Vk_mat' * differ_mat ;     %得到协方差矩阵的特征向量组成的投影子空间
+Ei_Face = Vk_mat' * differ_mat ;     %得到投影子空间的坐标
 
-% display the Eigenface
-figure
-for x = 1:k
-    temp_mat = Vk_mat(:,x);
-    temp_mat = reshape(temp_mat,[row col]);
-    subplot(5,5,x),imshow(temp_mat,[]);
-end
-
-% project_sample d*N
-% project_sample = [];
-% project_sample = Vk_mat * Ei_Face;
 t1 = toc;
+disp(['k: ',num2str(k)]);
 disp(['训练用时(s): ',num2str(t1)]);
-save training.mat img_mean Vk_mat Ei_Face testing_set d
+save training.mat img_mean Vk_mat Ei_Face d
+save eigenvector_sort.mat eiv_sort differ_mat img_mean
